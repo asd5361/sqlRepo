@@ -3,7 +3,7 @@
 
 -- 1번
 -- 춘 기술대학교의 학과 이름과 계열을 표시하시오. 단, 출력 헤더는 "학과 명", "계열"으로 표시하도록 한다.
-
+SELECT department_name AS "학과 명",category AS "계열" FROM tb_department;
 
 -- 2번
 -- 학과의 학과 정원을 다음과 같은 형태로 화면에 출력한다.
@@ -12,11 +12,13 @@
     영어영문학과의 정원은 36명 입니다.
     ...
 */
-
+SELECT department_name||'의 정원은 '||capacity||'명 입니다.' AS "학과 정원" FROM tb_department;
 
 -- 3번
 -- "국어국문학과" 에 다니는 여학생 중 현재 휴학중인 여학생을 찾아달라는 요청이 들어왔다. 누구인가?
 -- (국문학과의 '학과코드'는 학과 테이블(TB_DEPARTMENT)을 조회해서 찾아 내도록 하자)
+SELECT * FROM tb_student WHERE ABSENCE_YN LIKE 'Y'
+AND student_ssn LIKE '_______2%' AND department_NO ='001';
 
                      
 -- 4번 
@@ -24,16 +26,16 @@
 -- 그 대상자들의 학번이 다음과 같을 때 대상자들을 찾는 적절한 SQL구문을 작성하시오.
 -- A513079, A513090, A513091, A513110, A513119
 -- (이름 기준 내림차순 정렬)
-
+SELECT * FROM tb_student WHERE student_no IN ('A513079','A513090','A513091','A513110','A513119');
 
 -- 5번
 -- 입학 정원이 20명 이상 30명 이하인 학과들의 학과 이름과 계열을 출력하시오.
-
+SELECT * FROM tb_department WHERE capacity >=20 AND capacity <=30;
 
 -- 6번
 -- 춘 기술대학교는 총장을 제외하고 모든 교수들이 소속 학과를 가지고 있다.
 -- 그럼 춘 기술대학교 총장의 이름을 알아낼 수 있는 SQL 문장을 작성하시오.
-
+SELECT * FROM tb_professor WHERE department_no IS NULL;
 
 -- 7번
 -- 혹시 전상상의 착오로 학과가 지정되어 있지 않은 학생이 있는지 확인하고자 한다.
