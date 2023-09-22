@@ -35,7 +35,7 @@ SELECT EMP_NAME,SALARY*12+NVL(BONUS,0) AS TOTAL FROM employee;
     --FLOOR(숫자)반내림 --CEIL(숫자)반올림 --TRUNC(숫자,1)소숫점 없애기 -TO_CHAR(SYSTEMDATE'YYYY.MM.DD',) 날짜표시형식변경
 SELECT 
     emp_name,
-    FLOOR(SYSDATE-HIRE_DATE) AS "근무 일수                 ",
+    FLOOR(SYSDATE-HIRE_DATE) AS "근무 일수",
     TO_CHAR(HIRE_DATE, 'YYYY-MM-DD') as HIRE_DATE  
 FROM employee;
 
@@ -151,3 +151,69 @@ SELECT emp_name, EMP_NO, DEPT_CODE, phone FROM employee WHERE phone LIKE '___9%'
 --EMPLOYEE 테이블에서 이메일 중 _ 앞 글자가 3자리인 이메일 주소를 가진 사원의 사번 사원명, 이메일 조회
 -- ex) sun_di@kh.or.kr, yoo_js@kh.or.kr, ...
 SELECT * FROM employee WHERE email LIKE '___\_%' ESCAPE '\';
+
+/*
+    <IS NULL / IS NOT NULL>
+        [문법]
+            WHERE 비교대상컬럼 IS [NOT] NULL;
+            
+        - 컬럼 값에 NULL이 있을 경우 NULL 값 비교에 사용된다.
+          IS NULL : 비교대상컬럼 값이 NULL인 경우 TRUE를 리턴한다.
+          IS NOT NULL : 비교대상컬럼 값이 NULL이 아닌 경우 TRUE 리턴한다.
+*/ 
+-- EMPLOYEE 테이블에서 보너스를 받지 않는 사원의 사번, 사원명, 급여 조회
+SELECT * FROM EMPLOYEE WHERE bonus IS NULL; -- NULL은 비교 연산 불가능
+
+--EMPLOYEE 테이블에서 관리자(사수)가 없는 사원 이름, 부서 코드 조회 
+SELECT EMP_NAME, dept_code FROM employee WHERE MANAGER_ID IS NULL;
+SELECT EMP_NAME, dept_code FROM employee WHERE MANAGER_ID IS NOT NULL;
+
+SELECT * FROM employee WHERE dept_code IS NULL AND bonus IS NOT NULL;
+
+/*
+    <IN>
+        [문법]
+            WHERE 비교대상컬럼 IN('값', '값', '값', ..., '값');
+        
+        - 값 목록 중에 일치하는 값이 있을 때 TRUE 리턴한다.
+*/
+-- 부서코드 D5, D6, D8 에 해당하는 사원들의 모든 컬럼 조회
+SELECT * FROM EMPLOYEE WHERE dept_code IN ('D5','D6','D8');
+
+/*
+    <연산자 우선순위>
+        0. ()
+        1. 산술 연산자
+        2. 연결 연산자
+        3. 비교 연산자
+        4. IS NULL, LIKE, IN
+        5. BETWEEN AND
+        6. 논리 연산자 - NOT
+        7. 논리 연산자 - AND
+        8. 논리 연산자 - OR
+*/
+
+/*
+    <ORDER BY>
+        [문법]
+            SELECT 컬럼, 컬럼, ..., 컬럼
+              FROM 테이블명
+             WHERE 조건식
+          ORDER BY 정렬시키고자 하는 컬럼명|별칭|컬럼 순번 [ASC|DESC] [NULLS FIRST | NULLS LAST];
+          
+        - SELECT 문에서 가장 마지막에 기입하는 구문으로 실행 또한 가장 마지막에 진행된다.
+        - ASC : 오름차순으로 정렬한다. (ASC 또는 DESC 생략 시 기본값)
+        - DESC : 내림차순으로 정렬한다.
+        - NULLS FIRST : 정렬하고자 하는 컬럼 값에 NULL이 있는 경우 해당 데이터 값을 맨 앞으로 정렬한다.
+        - NULLS LAST : 정렬하고자 하는 컬럼 값에 NULL이 있는 경우 해당 데이터 값을 맨 뒤로 정렬한다.
+*/
+-- EMPLOYEE 테이블에서 BONUS로 오름차순 정렬
+    SELECT * FROM employee ORDER BY BONUS; --정렬은 기본이 ASC , ASC은 NULLS LSAT
+
+-- EMPLOYEE 테이블에서 BONUS로 내림차순 정렬(단, BONUS 값이 일치할 경우 그때는 SALARY 가지고 오름차순정렬)
+    SELECT * FROM employee ORDER BY BONUS DESC, salary;
+-- NVL(BONUS,0)
+-- EMPLOYEE 테이블에서 연봉별 내림차순으로 정렬된 사원의 사원명, 연봉 조회
+    SELECT EMP_NAME,SALARY*12 AS "연봉" FROM employee ORDER BY "연봉" DESC;
+
+    

@@ -5,5 +5,6 @@ select emp_name, phone from employee where NOT phone like '010%';
 -- 2. DEPARTMENT 테이블에서 해외영업부에 대한 모든 컬럼 조회
 select * from DEPARTMENT where dept_title like '해외영업%';
 
+
 ------------------------------------------------
 
