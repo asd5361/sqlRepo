@@ -397,3 +397,119 @@ SELECT '123' + '456A' FROM DUAL; -- 에러 발생(숫자 형태의 문자들만 자동형변환 된
 SELECT '10,000,000' + '500,000' FROM DUAL; -- 에러 발생
 SELECT TO_NUMBER('10,000,000', '99,999,999') + TO_NUMBER('500,000', '999,999') FROM DUAL;
 
+--NULL 처리 함수
+/*
+    1) NVL
+        [문법]
+        - NVL(컬럼, 컬럼값이 NULL일 경우 반환할 값)
+        
+        - NULL로 되어있는 컬럼의 값을 인자로 지정한 값으로 변경하여 반환한다.
+    
+    2) NVL2
+        [문법]
+        - NVL2(컬럼, 변경할 값 1, 변경할 값 2)
+            
+        - 컬럼 값이 NULL이 아니면 변경할 값 1, 컬럼 값이 NULL이면 변경할 값 2로 변경하여 반환한다.  
+    
+    3) NULLIF
+        [문법]
+        - NULLIF(비교대상 1, 비교대상 2)
+            
+        - 두 개의 값이 동일하면 NULL 반환, 두 개의 값이 동일하지 않으면 비교대상 1을 반환한다.
+*/
+-- EMPLOYEE 테이블에서 사원명, 보너스, 보너스가 포함된 연봉 조회
+SELECT EMP_NAME, NVL(bonus,0)AS BONUS, NVL(BONUS,0)*salary+salary*12 AS "연봉" FROM employee;
+
+-- EMPLOYEE 테이블에서 사원명, 부서 코드 조회(단, 부서코드가 NULL 이면 "부서없음" 출력)
+SELECT EMP_NAME, NVL(DEPT_CODE,'부서없음') AS DEPT_CODE FROM EMPLOYEE;
+
+--보너스 일괄적용 하여 연봉 조회(있던 사람들은 무조건 10%로 적용, 없으면 안줌)
+-- 사원 이름, 보너스, 연봉, 월급, 보너스 받은 금액
+SELECT EMP_NAME, NVL(bonus,0) AS BONUS, 
+SALARY*12+salary*NVL2(bonus,0.1,0)AS "연봉" ,
+SALARY, salary*NVL2(bonus,0.1,0)AS "보너스"
+FROM employee;
+
+--NVLIF 예제 코드
+SELECT NULLIF('123', '123') FROM DUAL;
+SELECT NULLIF('123', '456') FROM DUAL;
+
+SELECT NULLIF(123, 123) FROM DUAL; 
+SELECT NULLIF(123, 456) FROM DUAL;
+/*
+    <선택함수>
+        여러 가지 경우에 선택을 할 수 있는 기능을 제공하는 함수이다.
+    
+    1) DECODE
+        [문법]
+            DECODE(칼럼|계산식, 조건값 1, 결과값 1, 조건값 2, 결과값 2, ..., 결과값)
+        
+        - 비교하고자 하는 값이 조건값과 일치할 경우 그에 해당하는 결과값을 반환해 주는 함수이다.
+*/
+-- 값이 많아진다면 DECODE 말고 CASE END 이용하는 것이 좋다.
+SELECT EMP_NAME, EMP_NO, DECODE(SUBSTR(EMP_NO,8,1),1,'남자',2,'여자') AS "성별" FROM EMPLOYEE;
+
+/*
+    2) CASE
+        [문법]
+            CASE WHEN 조건식 1 THEN 결과값 1
+                 WHEN 조건식 2 THEN 결과값 2
+                 ...
+                 ELSE 결과값 N
+            END
+*/
+SELECT 
+    EMP_NAME
+    ,EMP_NO
+    ,CASE
+        WHEN SUBSTR(EMP_NO,8,1)=1 THEN '남자'
+        WHEN SUBSTR(EMP_NO,8,1)=2 THEN '여자'
+        ELSE '2000년대생 이거나 외국인입니다'
+    END  AS "성별"
+FROM EMPLOYEE;
+
+/*
+    <그룹 함수>
+        대량의 데이터들로 집계나 통계 같은 작업을 처리해야 하는 경우 사용되는 함수들이다.
+        모든 그룹 함수는 NULL 값을 자동으로 제외하고 값이 있는 것들만 계산을 한다.
+        따라서 AVG 함수를 사용할 때는 반드시 NVL() 함수와 함께 사용하는 것을 권장한다.
+        
+              1) SUM
+            [문법]
+                SUM(NUMBER)
+                
+            - 해당 칼럼 값들의 총 합계를 반환한다.
+            
+         2) AVG
+            [문법]
+                AVG(NUMBER)
+            
+            - 해당 컬럼 값들의 평균을 구해서 반환한다.
+        
+         3) MIN / MAX
+            [문법]
+                MIN/MAX(모든 타입 컬럼)
+            
+            - MIN : 해당 컬럼 값들 중에 가장 작은 값을 반환한다.
+            - MAX : 해당 컬럼 값들 중에 가장 큰 값을 반환한다.
+            
+         4) COUNT
+            [문법]
+                COUNT(*|컬럼명|DISTINCT 컬럼명)
+            
+            - 컬럼 또는 행의 개수를 세서 반환하는 함수이다.
+            - COUNT(*) : 조회 결과에 해당하는 모든 행의 개수를 반환한다.
+            - COUNT(컬럼명) : 제시한 컬럼 값이 NULL이 아닌 행의 개수를 반환한다.
+            - COUNT(DISTINCT 컬럼명) 해당 컬럼 값의 중복을 제거한 행의 개수를 반환한다. 
+*/
+
+-- 모든 사원의 월급 합계
+SELECT  SUM(salary)
+        ,AVG(SALARY)
+        ,MIN(SALARY)
+        ,MAX(sALARY)
+        ,COUNT(SALARY) 
+FROM EMPLOYEE;
+
+-- 그룹함수는 NULL값을 취급하지 않는다. NULL값을 0으로 치환한 뒤 계산
+SELECT AVG(NVL(BONUS,0)) FROM EMPLOYEE;
