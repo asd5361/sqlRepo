@@ -89,6 +89,7 @@ FROM tb_student GROUP BY STUDENT_NAME HAVING COUNT(*)>1 ORDER BY 1;
 -- 15번
 -- 학번이 A112113인 김고운 학생의 년도, 학기 별 평점과 년도 별 누적 평점, 총 평점을 구하는 SQL문을 작성하시오.
 -- (단, 평점은 소수점 1자리까지만 반올림하여 표시한다.)
+-- 학기 별 평점 => POINT / 년도 별 누적 평점 => POINT 
 
 SELECT 
     NVL(SUBSTR(term_no,1,4),' ') "년도"
